@@ -18,37 +18,52 @@ class BlogIndexTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        BlogPost::create([
-           'title' => 'Parallel php',
-           'date' => '2021-02-01',
-           'body' => 'test',
-           'author' => 'User',
-           'status'=> BlogPostStatus::PUBLISHED()
-        ]);
+        // BlogPost::factory()->count(4)->create()
 
-        BlogPost::create([
-            'title' => 'Parallel php1',
-            'date' => '2021-01-01',
-            'body' => 'test',
-            'author' => 'User',
-            'status'=> BlogPostStatus::PUBLISHED()
-        ]);
+        BlogPost::factory()
+            ->count(4)
+            ->sequence([
+                'title' => 'Parallel php',
+                'status' => BlogPostStatus::PUBLISHED()
+            ], [
+                'title' => 'Parallel php1',
+                'status' => BlogPostStatus::PUBLISHED()
+            ], [
+                'title' => 'Parallel php2',
+                'status' => BlogPostStatus::PUBLISHED()
+            ], [
+                'title' => 'Draft post',
+                'status' => BlogPostStatus::DRAFT()
+            ])
+            ->create();
 
-        BlogPost::create([
-            'title' => 'Draft post',
-            'date' => '2021-02-02',
-            'body' => 'test',
-            'author' => 'User',
-            'status'=> BlogPostStatus::DRAFT()
-        ]);
+//        BlogPost::factory()->create([
+//           'title' => 'Parallel php',
+//           'status'=> BlogPostStatus::PUBLISHED()
+//        ]);
+//
+//        BlogPost::factory()->create([
+//            'title' => 'Parallel php1',
+//            'status'=> BlogPostStatus::PUBLISHED()
+//        ]);
+//
+//        BlogPost::factory()->create([
+//            'title' => 'Parallel php2',
+//            'status'=> BlogPostStatus::PUBLISHED()
+//        ]);
+//
+//        BlogPost::factory()->create([
+//            'title' => 'Draft post',
+//            'status'=> BlogPostStatus::DRAFT()
+//        ]);
 
         $this
             ->get('/')
             ->assertSuccessful()
             ->assertSee('Parallel php')
             ->assertSeeInOrder([
-               'Parallel php',
-               'Parallel php1'
+               'Parallel php1',
+               'Parallel php'
             ])
             ->assertDontSee('Draft post');
     }
