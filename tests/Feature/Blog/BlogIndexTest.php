@@ -3,7 +3,6 @@
 namespace Tests\Feature\Blog;
 
 use App\Models\BlogPost;
-use App\Models\Enums\BlogPostStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,26 +17,26 @@ class BlogIndexTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        // BlogPost::factory()->count(4)->create()
+        //1. BlogPost::factory()->count(4)->create()
 
-        BlogPost::factory()
-            ->count(4)
-            ->sequence([
-                'title' => 'Parallel php',
-                'status' => BlogPostStatus::PUBLISHED()
-            ], [
-                'title' => 'Parallel php1',
-                'status' => BlogPostStatus::PUBLISHED()
-            ], [
-                'title' => 'Parallel php2',
-                'status' => BlogPostStatus::PUBLISHED()
-            ], [
-                'title' => 'Draft post',
-                'status' => BlogPostStatus::DRAFT()
-            ])
-            ->create();
+//      //2.  BlogPost::factory()
+//            ->count(4)
+//            ->sequence([
+//                'title' => 'Parallel php',
+//                'status' => BlogPostStatus::PUBLISHED()
+//            ], [
+//                'title' => 'Parallel php1',
+//                'status' => BlogPostStatus::PUBLISHED()
+//            ], [
+//                'title' => 'Parallel php2',
+//                'status' => BlogPostStatus::PUBLISHED()
+//            ], [
+//                'title' => 'Draft post',
+//                'status' => BlogPostStatus::DRAFT()
+//            ])
+//            ->create();
 
-//        BlogPost::factory()->create([
+//        // 3. BlogPost::factory()->create([
 //           'title' => 'Parallel php',
 //           'status'=> BlogPostStatus::PUBLISHED()
 //        ]);
@@ -56,6 +55,21 @@ class BlogIndexTest extends TestCase
 //            'title' => 'Draft post',
 //            'status'=> BlogPostStatus::DRAFT()
 //        ]);
+
+        // 4
+        BlogPost::factory()
+            ->count(3)
+            ->published()
+            ->sequence(
+                ['title' => 'Parallel php'],
+                ['title' => 'Parallel php1'],
+                ['title' => 'Parallel php2']
+            )
+            ->create();
+
+        BlogPost::factory()
+            ->draft()
+            ->create(['title' => 'Draft post']);
 
         $this
             ->get('/')
