@@ -29,7 +29,7 @@ class BlogPostAdminControllerTest extends TestCase
 
         $this->assertNotEquals('test', $post->refresh()->title);
 
-        $this->actingAs(User::factory()->create());
+        $this->login();
 
         $sendRequest();
 
