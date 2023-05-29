@@ -19,7 +19,7 @@ class ExternalPostSuggestionController
 
         $url = $validated['url'];
 
-        ExternalPost::create([
+        $post = ExternalPost::create([
             'title' => $title,
             'url' => $url,
             'domain' => str_replace('www.', '', parse_url($validated['url'], PHP_URL_HOST)),
