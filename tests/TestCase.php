@@ -5,6 +5,8 @@ namespace Tests;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -18,5 +20,15 @@ abstract class TestCase extends BaseTestCase
         $this->actingAs($user);
 
         return $user;
+    }
+
+    public function createRequest($method, $uri): Request
+    {
+        $symfonyRequest = SymfonyRequest::create(
+          $uri,
+          $method,
+        );
+
+        return Request::createFromBase($symfonyRequest);
     }
 }
