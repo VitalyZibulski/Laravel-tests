@@ -17,26 +17,21 @@ class BlogPostAdminControllerTest extends TestCase
     {
         $post = BlogPost::factory()->create();
 
-        $this
+        $sendRequest = fn() => $this
             ->post(action([BlogPostAdminController::class, 'update'], $post->slug), [
                'title' => 'test',
                'author' => $post->author,
                'body' => $post->body,
                'date' => $post->date->format('Y-m-d')
-            ])
-        ->assertRedirect(route('login'));
+            ]);
+
+        $sendRequest()->assertRedirect(route('login'));
 
         $this->assertNotEquals('test', $post->refresh()->title);
 
         $this->actingAs(User::factory()->create());
 
-        $this
-            ->post(action([BlogPostAdminController::class, 'update'], $post->slug), [
-                'title' => 'test',
-                'author' => $post->author,
-                'body' => $post->body,
-                'date' => $post->date->format('Y-m-d')
-            ]);
+        $sendRequest();
 
         $this->assertEquals('test', $post->refresh()->title);
     }
