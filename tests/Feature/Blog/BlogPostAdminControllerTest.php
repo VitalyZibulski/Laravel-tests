@@ -35,4 +35,50 @@ class BlogPostAdminControllerTest extends TestCase
 
         $this->assertEquals('test', $post->refresh()->title);
     }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function it_required_fields()
+    {
+        $this->login();
+
+        $post = BlogPost::factory()->create();
+
+        $this->post(action([BlogPostAdminController::class, 'update'], $post->slug), [])
+            ->assertSessionHasErrors(['title', 'author', 'body', 'date']);
+
+        $this->post(action([BlogPostAdminController::class, 'update'], $post->slug), [
+            'title' => $post->title,
+            'author' => $post->author,
+            'body' => $post->body,
+            'date' => $post->date->format('Y-m-d'),
+        ])
+            ->assertSessionHasNoErrors();
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function it_date_format_is_validated()
+    {
+        $this->login();
+
+        $post = BlogPost::factory()->create();
+
+        $this->post(action([BlogPostAdminController::class, 'update'], $post->slug), [
+            'title' => $post->title,
+            'author' => $post->author,
+            'body' => $post->body,
+            'date' => '01/01/2021',
+        ])
+            ->dumpSession()
+//            ->assertSessionHasErrors(['date']);
+            // or
+            ->assertSessionHasErrors([
+                'date' => 'The date does not match the format Y-m-d.'
+            ]);
+    }
 }
