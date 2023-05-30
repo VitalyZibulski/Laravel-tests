@@ -5,35 +5,43 @@ namespace Tests\Feature\Blog;
 use App\Http\Controllers\BlogPostAdminController;
 use App\Models\BlogPost;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 
 class BlogPostAdminControllerTest extends TestCase
 {
+    private Model $post;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->post = BlogPost::factory()->create();
+    }
+
     /**
      * @test
      * @return void
      */
     public function it_only_logged_user_can_make_changes_to_post()
     {
-        $post = BlogPost::factory()->create();
-
         $sendRequest = fn() => $this
-            ->post(action([BlogPostAdminController::class, 'update'], $post->slug), [
+            ->post(action([BlogPostAdminController::class, 'update'], $this->post->slug), [
                'title' => 'test',
-               'author' => $post->author,
-               'body' => $post->body,
-               'date' => $post->date->format('Y-m-d')
+               'author' => $this->post->author,
+               'body' => $this->post->body,
+               'date' => $this->post->date->format('Y-m-d')
             ]);
 
         $sendRequest()->assertRedirect(route('login'));
 
-        $this->assertNotEquals('test', $post->refresh()->title);
+        $this->assertNotEquals('test', $this->post->refresh()->title);
 
         $this->login();
 
         $sendRequest();
 
-        $this->assertEquals('test', $post->refresh()->title);
+        $this->assertEquals('test', $this->post->refresh()->title);
     }
 
     /**
@@ -44,16 +52,14 @@ class BlogPostAdminControllerTest extends TestCase
     {
         $this->login();
 
-        $post = BlogPost::factory()->create();
-
-        $this->post(action([BlogPostAdminController::class, 'update'], $post->slug), [])
+        $this->post(action([BlogPostAdminController::class, 'update'], $this->post->slug), [])
             ->assertSessionHasErrors(['title', 'author', 'body', 'date']);
 
-        $this->post(action([BlogPostAdminController::class, 'update'], $post->slug), [
-            'title' => $post->title,
-            'author' => $post->author,
-            'body' => $post->body,
-            'date' => $post->date->format('Y-m-d'),
+        $this->post(action([BlogPostAdminController::class, 'update'], $this->post->slug), [
+            'title' => $this->post->title,
+            'author' => $this->post->author,
+            'body' => $this->post->body,
+            'date' => $this->post->date->format('Y-m-d'),
         ])
             ->assertSessionHasNoErrors();
     }
@@ -66,12 +72,10 @@ class BlogPostAdminControllerTest extends TestCase
     {
         $this->login();
 
-        $post = BlogPost::factory()->create();
-
-        $this->post(action([BlogPostAdminController::class, 'update'], $post->slug), [
-            'title' => $post->title,
-            'author' => $post->author,
-            'body' => $post->body,
+        $this->post(action([BlogPostAdminController::class, 'update'], $this->post->slug), [
+            'title' => $this->post->title,
+            'author' => $this->post->author,
+            'body' => $this->post->body,
             'date' => '01/01/2021',
         ])
             ->dumpSession()
